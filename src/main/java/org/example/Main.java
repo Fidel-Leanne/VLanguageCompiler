@@ -11,9 +11,7 @@ public class Main {
                 "temp = <s%*h - j / w - d +*$&;\n" +
                 "D = A+B/C\n" +
                 "E = G/H-I+a*B/c\n" +
-                "WRITE D\n" +
-                "WRITEE F;\n" +
-                "END";
+                "WRITE D\n";
 
         Lexer lexer = new Lexer();
 
