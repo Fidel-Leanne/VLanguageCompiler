@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Lexer {
+
     private Map<String, TokenType> keywords;
     private Map<String, TokenType> operators;
     private Map<String, TokenType> symbols;
@@ -78,7 +79,7 @@ public class Lexer {
             }
 
             // Check for valid characters
-            if (!word.matches("[A-Za-z0-9+=,/*;-]+")) {
+            if (!word.matches("[A-Za-z+=,/*;-]+")) {
                 throw new LexicalException("Syntax error: Invalid character '" + word + "' at line " + lineNumber);
             }
 

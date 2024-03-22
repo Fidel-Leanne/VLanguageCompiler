@@ -4,23 +4,20 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String inputCode = "BEGIN\n" +
-                "INTEG A, B, C, D, E\n" +
-                "LET B = A - / C\n" +
-                "INPUT A, B, C\n" +
-                "temp = <s%*h - j / w - d +*$&;\n" +
-                "D = A+B/C\n" +
-                "E = G/H-I+a*B/c\n" +
-                "WRITE D\n";
+        String inputCode = "BEGIN\n"+"INTEG A\n"
+                +"END";
 
         Lexer lexer = new Lexer();
 
         try {
+            // Tokenize the input code
             List<Token> tokens = lexer.tokenize(inputCode);
-            // Print tokens
-            for (Token token : tokens) {
-                System.out.println(token);
-            }
+
+            // Create a Parser object with the list of tokens
+            Parser parser = new Parser(tokens);
+
+            // Parse the tokens
+            parser.parse();
         } catch (LexicalException e) {
             System.out.println("Lexical error: " + e.getMessage());
         }

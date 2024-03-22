@@ -10,6 +10,7 @@ package org.example;
         KEYWORD_WRITE,
         KEYWORD_END,
         KEYWORD_REAL,
+        KEYWORD_OUTPUT,
         IDENTIFIER,
         OPERATOR_ADD,
         OPERATOR_DIVIDE,
