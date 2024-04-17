@@ -11,351 +11,270 @@ public class Parser {
         this.currentTokenIndex = 0;
     }
 
-    public void parse() {
-        // Start parsing the program
-        parseProgram();
-
-        // Check if there are remaining tokens
-        if (currentTokenIndex < tokens.size()) {
-            // Report syntax error: unexpected tokens after the end of the program
-            System.out.println("Syntax error: Unexpected tokens after the end of the program");
-        } else {
-            // Parsing successful
-            System.out.println("Parsing successful");
-        }
+    public void parse() throws ParseException {
+        System.out.println("Starting parsing...");
+        program();
+        System.out.println("Parsing complete.");
     }
 
-    private void parseProgram() {
-        // Parse the program: statementList
-        parseStatementList();
-    }
+    private void program() throws ParseException {
+        System.out.println("Parsing program...");
+        match(TokenType.KEYWORD_START);
 
-    private void parseStatementList() {
-        // Parse the statement list: statement statementList | ε
         while (currentTokenIndex < tokens.size()) {
-            // Parse a single statement
-            parseStatement();
+            System.out.println("Parsing statement...");
+            statement();
         }
+
+        match(TokenType.KEYWORD_STOP);
+        System.out.println("Program parsed successfully.");
     }
 
-    private void parseStatement() {
-        // Check the current token to determine the type of statement
-        if (currentTokenIndex < tokens.size()) {
-            Token currentToken = tokens.get(currentTokenIndex);
 
-            // Check if the token corresponds to a specific statement type
-            switch (currentToken.getType()) {
-                case KEYWORD_BEGIN:
-                    // Parse block statement
-                    parseBlockStatement();
-                    break;
-                case KEYWORD_LET:
-                    // Parse variable declaration statement
-                    parseVariableDeclaration();
-                    break;
-                case KEYWORD_INPUT:
-                    // Parse input statement
-                    parseInputStatement();
-                    break;
-                case KEYWORD_OUTPUT:
-                    // Parse output statement
-                    parseOutputStatement();
-                    break;
-                case IDENTIFIER:
-                    // Parse assignment statement or function call
-                    parseAssignmentOrFunctionCall();
-                    break;
-                // Add cases for other statement types as needed
-                default:
-                    // Report syntax error: unexpected token for statement
-                    System.out.println("Syntax error: Unexpected token for statement " + currentToken);
-                    break;
-            }
+    private void statement() throws ParseException {
+        System.out.println("Identifying statement type...");
+        if (tokens.get(currentTokenIndex).getType() == TokenType.KEYWORD_INTEGER) {
+            System.out.println("Variable declaration statement found.");
+            variableDeclaration();
+        } else if (tokens.get(currentTokenIndex).getType() == TokenType.IDENTIFIER) {
+            System.out.println("Assignment statement found.");
+            assignment();
+        } else if (tokens.get(currentTokenIndex).getType() == TokenType.KEYWORD_READ) {
+            System.out.println("Read statement found.");
+            readStatement();
+        } else if (tokens.get(currentTokenIndex).getType() == TokenType.KEYWORD_WRITE) {
+            System.out.println("Write statement found.");
+            writeStatement();
         } else {
-            // Report syntax error: unexpected end of input
-            System.out.println("Syntax error: Unexpected end of input");
+            throw new ParseException("Syntax error: Invalid statement at token " + currentTokenIndex);
         }
     }
 
-    private void parseBlockStatement() {
-        // Match the BEGIN keyword
-        match(TokenType.KEYWORD_BEGIN, "");
+    private void writeStatement() throws ParseException {
+        System.out.println("Parsing write statement...");
 
-        // Parse statements within the block
-        while (currentTokenIndex < tokens.size()) {
-            // Check if the current token is the END keyword
-            if (tokens.get(currentTokenIndex).getType() == TokenType.KEYWORD_END) {
-                // Move to the next token to exit the loop
-                currentTokenIndex++;
-                return;
-            }
+        // Consume the "WRITE" keyword token
+        System.out.println("Consuming WRITE keyword token...");
+        consume(TokenType.KEYWORD_WRITE);
+        System.out.println("WRITE keyword token consumed successfully.");
 
-            // Parse individual statements within the block
-            parseStatement();
-        }
-
-        // If the loop exits without encountering the END keyword, report a syntax error
-        System.out.println("Syntax error: Expected END keyword");
-    }
-
-
-
-    private void parseVariableDeclaration() {
-        // Parse variable declaration: INTEG/REAL identifier [, identifier] ;
-
-        // Match the INTEG or REAL keyword
-        if (tokens.get(currentTokenIndex).getType() == TokenType.KEYWORD_INTEG ||
-                tokens.get(currentTokenIndex).getType() == TokenType.KEYWORD_REAL) {
-            // Move to the next token
-            currentTokenIndex++;
-        } else {
-            // Report syntax error: Expected INTEG or REAL keyword
-            System.out.println("Syntax error: Expected INTEG  keyword");
-            return;
-        }
-
-        // Parse one or more identifiers separated by commas
-        while (true) {
-            // Parse an identifier
-            parseIdentifier();
-
-            // Check if there's a comma to parse more identifiers
-            if (currentTokenIndex < tokens.size()) {
-                Token currentToken = tokens.get(currentTokenIndex);
-                if (currentToken.getType() == TokenType.SYMBOL && currentToken.getValue().equals(",")) {
-                    // Move to the next token
-                    currentTokenIndex++;
-                } else {
-                    // No more identifiers to parse
-                    break;
-                }
-            } else {
-                // Syntax error: Unexpected end of input
-                System.out.println("Syntax error: Unexpected end of input");
-                return;
-            }
-        }
-
-        // Expect a semicolon at the end of the variable declaration
-        match(TokenType.SYMBOL, ";");
-    }
-
-
-    private void parseIdentifier() {
-        if (currentTokenIndex < tokens.size()) {
-            Token currentToken = tokens.get(currentTokenIndex);
-            if (currentToken.getType() == TokenType.IDENTIFIER) {
-                // Process the identifier token (e.g., store it, perform further validation)
-                // For now, you can simply move to the next token
-                currentTokenIndex++;
-            } else {
-                // Report syntax error: Expected an identifier token
-                System.out.println("Syntax error: Expected an identifier but found " + currentToken);
-            }
-        } else {
-            // Report syntax error: Unexpected end of input
-            System.out.println("Syntax error: Unexpected end of input");
-        }
-    }
-
-
-
-    private void parseInputStatement() {
-        // Parse input statement: INPUT identifier [, identifier] ;
-
-        // Match the INPUT keyword
-        match(TokenType.KEYWORD_INPUT, "");
-
-        // Parse one or more identifiers separated by commas
-        while (true) {
-            // Parse an identifier
-            parseIdentifier();
-
-            // Check if there's a comma to parse more identifiers
-            if (currentTokenIndex < tokens.size()) {
-                Token currentToken = tokens.get(currentTokenIndex);
-                if (currentToken.getType() == TokenType.SYMBOL && currentToken.getValue().equals(",")) {
-                    // Move to the next token
-                    currentTokenIndex++;
-                } else {
-                    // No more identifiers to parse
-                    break;
-                }
-            } else {
-                // End of input statement
-                return;
-            }
-        }
-    }
-
-
-    private void parseOutputStatement() {
-        // Parse output statement: WRITE expression [, expression] ;
-
-        // Match the WRITE keyword
-        match(TokenType.KEYWORD_WRITE, "");
-
-        // Parse one or more expressions or identifiers separated by commas
-        while (true) {
-            // Parse an expression or identifier
-            parseExpression();
-
-            // Check if there's a comma to parse more expressions or identifiers
-            if (currentTokenIndex < tokens.size()) {
-                Token currentToken = tokens.get(currentTokenIndex);
-                if (currentToken.getType() == TokenType.SYMBOL && currentToken.getValue().equals(",")) {
-                    // Move to the next token
-                    currentTokenIndex++;
-                } else {
-                    // No more expressions or identifiers to parse
-                    break;
-                }
-            } else {
-                // End of output statement
-                return;
-            }
-        }
-    }
-
-    private void parseExpression() {
-        // Implement parsing of expressions
-
-        // Check the current token to determine the type of expression
-        if (currentTokenIndex < tokens.size()) {
-            Token currentToken = tokens.get(currentTokenIndex);
-
-            // Check if the token corresponds to a specific type of expression
-            switch (currentToken.getType()) {
-                case IDENTIFIER:
-                    // Parse an identifier
-                    parseIdentifier();
-                    break;
-                case SYMBOL:
-                    // Check for parentheses to parse a parenthesized expression
-                    if (currentToken.getValue().equals("(")) {
-                        parseParenthesizedExpression();
-                    } else {
-                        // Check if the symbol is an allowed arithmetic operator
-                        if (isArithmeticOperator(currentToken.getValue())) {
-                            // Move to the next token
-                            currentTokenIndex++;
-                        } else {
-                            // Syntax error: Unexpected symbol in expression
-                            System.out.println("Syntax error: Unexpected symbol in expression " + currentToken);
-                        }
-                    }
-                    break;
-                // Add cases for other types of expressions as needed
-                default:
-                    // Syntax error: Unexpected token for expression
-                    System.out.println("Syntax error: Unexpected token for expression " + currentToken);
-                    break;
-            }
-        } else {
-            // Syntax error: Unexpected end of input
-            System.out.println("Syntax error: Unexpected end of input");
-        }
-    }
-
-    private void parseParenthesizedExpression() {
-        // Match the opening parenthesis "("
-        match(TokenType.SYMBOL, "(");
-
-        // Parse the expression inside the parentheses
+        // Parse the expression to be written
+        System.out.println("Parsing expression...");
         parseExpression();
+        System.out.println("Expression parsed successfully.");
 
-        // Match the closing parenthesis ")"
-        match(TokenType.SYMBOL, ")");
+        // Note: No need to consume semicolon token since it's not expected
     }
 
 
-    // Helper method to check if a symbol is an allowed arithmetic operator
-    private boolean isArithmeticOperator(String symbol) {
-        return symbol.equals("+") || symbol.equals("-") || symbol.equals("*") || symbol.equals("/");
+    private void parseExpression() throws ParseException {
+        System.out.println("Parsing expression...");
+
+        // Parse the first term
+        parseTerm();
+
+        // Loop to handle additional terms and operators
+        while (isAdditionOperator() || isSubtractionOperator()) {
+            // Consume the operator
+            TokenType operator = getCurrentToken().getType();
+            System.out.println("Encountered operator: " + operator);
+            consume(operator);
+
+            // Parse the next term
+            System.out.println("Parsing next term...");
+            parseTerm();
+            System.out.println("Term parsed successfully.");
+        }
+
+        System.out.println("Expression parsed successfully.");
+    }
+
+    private void parseTerm() throws ParseException {
+        System.out.println("Parsing term...");
+
+        // Parse the first factor
+        parseFactor();
+
+        // Loop to handle additional factors and operators
+        while (isMultiplicationOperator() || isDivisionOperator()) {
+            // Consume the operator
+            TokenType operator = getCurrentToken().getType();
+            System.out.println("Encountered operator: " + operator);
+            consume(operator);
+
+            // Parse the next factor
+            System.out.println("Parsing next factor...");
+            parseFactor();
+            System.out.println("Factor parsed successfully.");
+        }
+
+        System.out.println("Term parsed successfully.");
+    }
+
+
+    private void parseFactor() throws ParseException {
+        System.out.println("Parsing factor...");
+
+        // Check if the current token is an identifier
+        if (getCurrentToken().getType() == TokenType.IDENTIFIER) {
+            // Consume the identifier
+            Token identifierToken = getCurrentToken();
+            System.out.println("Consumed identifier: " + identifierToken.getValue());
+            consume(TokenType.IDENTIFIER);
+        } else {
+            // If it's not an identifier, it's a syntax error
+            throw new ParseException("Expected identifier");
+        }
+
+        System.out.println("Factor parsed successfully.");
     }
 
 
 
-    private void parseAssignmentOrFunctionCall() {
-        // Parse assignment statement or function call
+    private boolean isAdditionOperator() throws ParseException {
+        return getCurrentToken().getType() == TokenType.OPERATOR_ADD;
+    }
 
-        // Parse the identifier
+    private boolean isSubtractionOperator() throws ParseException {
+        return getCurrentToken().getType() == TokenType.OPERATOR_SUBTRACT;
+    }
+
+    private boolean isMultiplicationOperator() throws ParseException {
+        return getCurrentToken().getType() == TokenType.OPERATOR_MULTIPLY;
+    }
+
+    private boolean isDivisionOperator() throws ParseException {
+        return getCurrentToken().getType() == TokenType.OPERATOR_DIVIDE;
+    }
+
+    private Token getCurrentToken() throws ParseException {
+        if (currentTokenIndex < tokens.size()) {
+            return tokens.get(currentTokenIndex);
+        } else {
+            throw new ParseException("Unexpected end of input");
+        }
+    }
+
+
+
+    private void consume(TokenType tokenType) throws ParseException {
+        // Check if there are any tokens left
+        if (currentTokenIndex >= tokens.size()) {
+            throw new ParseException("Unexpected end of input");
+        }
+
+        // Get the next token
+        Token nextToken = tokens.get(currentTokenIndex);
+
+        // Check if the token type matches the expected type
+        if (nextToken.getType() != tokenType) {
+            throw new ParseException("Unexpected token '" + nextToken.getValue() + "' of type " +
+                    nextToken.getType() + ", expected " + tokenType);
+        }
+
+        // If the token type matches, consume the token by moving to the next one
+        currentTokenIndex++;
+    }
+
+
+
+    private void readStatement() throws ParseException {
+        // Check if the current token is READ
+        if (getCurrentToken().getType() == TokenType.KEYWORD_READ) {
+            // Consume the READ keyword
+            consume(TokenType.KEYWORD_READ);
+
+            // Parse the list of identifiers
+            parseIdentifierList();
+        } else {
+            // If it's not READ, it's a syntax error
+            throw new ParseException("Expected READ keyword");
+        }
+    }
+
+
+    private void parseIdentifierList() throws ParseException {
+        System.out.println("Parsing identifier list...");
+        // Parse the first identifier
         parseIdentifier();
 
-        // Check the next token
-        if (currentTokenIndex < tokens.size()) {
-            Token currentToken = tokens.get(currentTokenIndex);
-
-            // If the next token is an assignment operator "=", parse an assignment statement
-            if (currentToken.getType() == TokenType.SYMBOL && currentToken.getValue().equals("=")) {
-                // Move to the next token
-                currentTokenIndex++;
-
-                // Parse the expression on the right-hand side of the assignment
-                parseExpression();
-
-                // No more tokens expected after the expression in an assignment statement
-            }
-            // If the next token is an opening parenthesis "(", parse a function call
-            else if (currentToken.getType() == TokenType.SYMBOL && currentToken.getValue().equals("(")) {
-                // Move to the next token
-                currentTokenIndex++;
-
-                // Parse the list of arguments (if any) enclosed in parentheses
-                parseArgumentList();
-
-                // Check for closing parenthesis
-                match(TokenType.SYMBOL, ")");
-            } else {
-                // Syntax error: Unexpected token after identifier
-                System.out.println("Syntax error: Unexpected token after identifier " + currentToken);
-            }
-        } else {
-            // Syntax error: Unexpected end of input
-            System.out.println("Syntax error: Unexpected end of input");
+        // Parse additional identifiers if there are any
+        while (getCurrentToken().getType() == TokenType.IDENTIFIER) {
+            System.out.println("Parsing next identifier...");
+            // Parse the next identifier
+            parseIdentifier();
         }
     }
 
-    // Helper method to parse a list of function call arguments
-    private void parseArgumentList() {
-        // Parse a list of arguments: expression [, expression]*
+
+    private void parseIdentifier() throws ParseException {
+        System.out.println("Parsing identifier...");
+
+        // Check if the current token is an identifier
+        if (getCurrentToken().getType() == TokenType.IDENTIFIER) {
+            // Consume the identifier token
+            consume(TokenType.IDENTIFIER);
+        } else {
+            // Throw an exception if the current token is not an identifier
+            throw new ParseException("Expected identifier but found " + getCurrentToken().getType());
+        }
+    }
+
+
+
+
+    private void assignment() throws ParseException {
+        System.out.println("Parsing assignment...");
+
+        // Parse the left-hand side identifier
+        System.out.println("Parsing left-hand side identifier...");
+        parseIdentifier();
+
+        // Consume the assignment symbol
+        System.out.println("Consuming assignment symbol...");
+        consume(TokenType.SYMBOL_ASSIGNMENT);
+
+        // Parse the right-hand side expression
+        System.out.println("Parsing right-hand side expression...");
         parseExpression();
-
-        // Parse additional expressions if there are commas
-        while (currentTokenIndex < tokens.size()) {
-            Token currentToken = tokens.get(currentTokenIndex);
-            if (currentToken.getType() == TokenType.SYMBOL && currentToken.getValue().equals(",")) {
-                // Move to the next token
-                currentTokenIndex++;
-
-                // Parse the next expression
-                parseExpression();
-            } else {
-                // No more arguments to parse
-                break;
-            }
-        }
     }
 
 
 
-    // Implement other parsing methods for specific types of statements, expressions, etc.
+    private void variableDeclaration() throws ParseException {
+        System.out.println("Parsing variable declaration...");
 
-    private void match(TokenType expectedType, String expectedValue) {
-        // Utility method to match the current token with an expected type and value
+        // Consume the keyword "INTEGER"
+        consume(TokenType.KEYWORD_INTEGER);
+        System.out.println("Consumed 'INTEGER' keyword...");
+
+        // Parse the list of identifiers
+        parseIdentifierList();
+    }
+
+
+
+    private void match(TokenType expectedTokenType) throws ParseException {
+        System.out.println("Matching tokens: Expected " + expectedTokenType);
+
+        // Check if there are tokens left to match
         if (currentTokenIndex < tokens.size()) {
             Token currentToken = tokens.get(currentTokenIndex);
-            if (currentToken.getType() == expectedType &&
-                    (expectedValue.isEmpty() || currentToken.getValue().equals(expectedValue))) {
+            TokenType currentTokenType = currentToken.getType();
+
+            // Compare the current token type with the expected type
+            if (currentTokenType == expectedTokenType) {
+                System.out.println("Matched: " + currentTokenType);
                 // Move to the next token
                 currentTokenIndex++;
             } else {
-                // Report syntax error: unexpected token
-                System.out.println("Syntax error: Unexpected token " + currentToken);
+                // Throw an exception if the token types don't match
+                throw new ParseException("Syntax error: Expected " + expectedTokenType + " but found " + currentTokenType);
             }
         } else {
-            // Report syntax error: unexpected end of input
-            System.out.println("Syntax error: Unexpected end of input");
+            // Throw an exception if there are no more tokens
+            throw new ParseException("Unexpected end of input");
         }
     }
+
 }

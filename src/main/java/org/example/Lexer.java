@@ -19,16 +19,19 @@ public class Lexer {
         initializeSymbols();
     }
 
+    //The acceptable keywords are: INTEGER, ASSIGN, READ, WRITE, START, STOP. 
+
+
     private void initializeKeywords() {
         keywords = new HashMap<>();
         // Populate the hashtable with keywords and their corresponding token types
-        keywords.put("BEGIN", TokenType.KEYWORD_BEGIN);
-        keywords.put("LET", TokenType.KEYWORD_LET);
-        keywords.put("INTEG", TokenType.KEYWORD_INTEG);
-        keywords.put("REAL", TokenType.KEYWORD_REAL);
-        keywords.put("INPUT", TokenType.KEYWORD_INPUT);
+       
+        keywords.put("INTEGER", TokenType.KEYWORD_INTEGER);
+        keywords.put("READ", TokenType.KEYWORD_READ);
         keywords.put("WRITE", TokenType.KEYWORD_WRITE);
-        keywords.put("END", TokenType.KEYWORD_END);
+        keywords.put("STOP", TokenType.KEYWORD_STOP);
+        keywords.put("START", TokenType.KEYWORD_START);
+        keywords.put("ASSIGN", TokenType.KEYWORD_ASSIGN);
     }
 
     private void initializeOperators() {
@@ -44,7 +47,7 @@ public class Lexer {
         symbols = new HashMap<>();
         // Populate the hashtable with symbols and their corresponding token types
         symbols.put("=", TokenType.SYMBOL_ASSIGNMENT);
-        symbols.put(",", TokenType.SYMBOL_COMMA);
+        symbols.put(";", TokenType.SYMBOL_SEMICOLON);
     }
 
     public List<Token> tokenize(String inputCode) throws LexicalException {
