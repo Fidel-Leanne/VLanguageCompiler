@@ -134,6 +134,15 @@ public class Lexer {
             throw new LexicalException("Syntax error: Semicolon at the end of the line not allowed at line " + lineNumber);
         }
 
+
+        // Print out the tokens
+        System.out.println("Tokens:");
+        for (Token token : tokens) {
+            System.out.println(token);
+        }
+
         return tokens;
+
+
     }
 }

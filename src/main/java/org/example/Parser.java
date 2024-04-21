@@ -21,9 +21,13 @@ public class Parser {
         System.out.println("Parsing program...");
         match(TokenType.KEYWORD_START);
 
-        while (currentTokenIndex < tokens.size()) {
-            System.out.println("Parsing statement...");
-            statement();
+        if (currentTokenIndex < tokens.size()) {
+            while (currentTokenIndex < tokens.size()) {
+                System.out.println("Parsing statement...");
+                statement();
+            }
+        } else {
+            throw new ParseException("Syntax error: No statements found after START keyword");
         }
 
         match(TokenType.KEYWORD_STOP);
@@ -31,22 +35,33 @@ public class Parser {
     }
 
 
+
     private void statement() throws ParseException {
         System.out.println("Identifying statement type...");
-        if (tokens.get(currentTokenIndex).getType() == TokenType.KEYWORD_INTEGER) {
-            System.out.println("Variable declaration statement found.");
-            variableDeclaration();
-        } else if (tokens.get(currentTokenIndex).getType() == TokenType.IDENTIFIER) {
-            System.out.println("Assignment statement found.");
-            assignment();
-        } else if (tokens.get(currentTokenIndex).getType() == TokenType.KEYWORD_READ) {
-            System.out.println("Read statement found.");
-            readStatement();
-        } else if (tokens.get(currentTokenIndex).getType() == TokenType.KEYWORD_WRITE) {
-            System.out.println("Write statement found.");
-            writeStatement();
-        } else {
-            throw new ParseException("Syntax error: Invalid statement at token " + currentTokenIndex);
+        TokenType currentTokenType = tokens.get(currentTokenIndex).getType();
+
+        switch (currentTokenType) {
+            case KEYWORD_INTEGER:
+                System.out.println("Variable declaration statement found.");
+                variableDeclaration();
+                break;
+            case IDENTIFIER:
+                System.out.println("Identifier statement found.");
+                assignment();
+                break;
+            case KEYWORD_READ:
+                System.out.println("Read statement found.");
+                readStatement();
+                break;
+            case KEYWORD_WRITE:
+                System.out.println("Write statement found.");
+                writeStatement();
+                break;
+            case KEYWORD_ASSIGN:
+                System.out.println("Assignment statement found");
+                assignment();
+            default:
+                throw new ParseException("Syntax error: Invalid statement at token " + currentTokenIndex);
         }
     }
 
@@ -59,11 +74,9 @@ public class Parser {
         System.out.println("WRITE keyword token consumed successfully.");
 
         // Parse the expression to be written
-        System.out.println("Parsing expression...");
-        parseExpression();
-        System.out.println("Expression parsed successfully.");
 
-        // Note: No need to consume semicolon token since it's not expected
+        parseIdentifierList();
+
     }
 
 
@@ -166,6 +179,8 @@ public class Parser {
         // Get the next token
         Token nextToken = tokens.get(currentTokenIndex);
 
+
+
         // Check if the token type matches the expected type
         if (nextToken.getType() != tokenType) {
             throw new ParseException("Unexpected token '" + nextToken.getValue() + "' of type " +
@@ -174,18 +189,29 @@ public class Parser {
 
         // If the token type matches, consume the token by moving to the next one
         currentTokenIndex++;
+
     }
 
 
 
+
     private void readStatement() throws ParseException {
+        System.out.println("Parsing READ statement...");
+
         // Check if the current token is READ
         if (getCurrentToken().getType() == TokenType.KEYWORD_READ) {
+            System.out.println("READ keyword found.");
+
             // Consume the READ keyword
             consume(TokenType.KEYWORD_READ);
 
             // Parse the list of identifiers
+            System.out.println("Parsing list of identifiers...");
             parseIdentifierList();
+
+            System.out.println("List of identifiers parsed successfully.");
+
+            System.out.println("READ statement parsed successfully.");
         } else {
             // If it's not READ, it's a syntax error
             throw new ParseException("Expected READ keyword");
@@ -193,8 +219,10 @@ public class Parser {
     }
 
 
+
     private void parseIdentifierList() throws ParseException {
         System.out.println("Parsing identifier list...");
+
         // Parse the first identifier
         parseIdentifier();
 
@@ -204,14 +232,52 @@ public class Parser {
             // Parse the next identifier
             parseIdentifier();
         }
+
+        System.out.println("Identifier list parsed successfully.");
+
+        // Check for keywords like ASSIGN, READ, WRITE, INTEGER
+        TokenType nextTokenType = getCurrentToken().getType();
+        switch (nextTokenType) {
+            case KEYWORD_ASSIGN:
+                System.out.println("Found ASSIGN keyword.");
+                assignment();
+                break;
+            case KEYWORD_READ:
+                System.out.println("Found READ keyword.");
+                readStatement();
+                break;
+            case KEYWORD_WRITE:
+                System.out.println("Found WRITE keyword.");
+                writeStatement();
+                break;
+            case KEYWORD_INTEGER:
+                System.out.println("Found INTEGER keyword.");
+                variableDeclaration();
+                break;
+            case KEYWORD_STOP:
+                System.out.println("found stop Keyword");
+                program();
+            default:
+                // If the next token is not one of the expected keywords, it's a syntax error
+                throw new ParseException("Syntax error: Expected ASSIGN, READ, WRITE, or INTEGER keyword");
+        }
     }
+
 
 
     private void parseIdentifier() throws ParseException {
         System.out.println("Parsing identifier...");
 
         // Check if the current token is an identifier
+        System.out.println("Current token type: " + getCurrentToken().getType());
         if (getCurrentToken().getType() == TokenType.IDENTIFIER) {
+            System.out.println("Let's find identifier");
+            // Get the identifier value
+            String identifier = getCurrentToken().getValue();
+
+            // Print the identifier
+            System.out.println("Found identifier: " + identifier);
+
             // Consume the identifier token
             consume(TokenType.IDENTIFIER);
         } else {
@@ -223,22 +289,23 @@ public class Parser {
 
 
 
+
+
     private void assignment() throws ParseException {
-        System.out.println("Parsing assignment...");
+        System.out.println("Parsing assignment statement...");
 
         // Parse the left-hand side identifier
-        System.out.println("Parsing left-hand side identifier...");
+        consume(TokenType.KEYWORD_ASSIGN);
         parseIdentifier();
+        System.out.println();
 
         // Consume the assignment symbol
-        System.out.println("Consuming assignment symbol...");
         consume(TokenType.SYMBOL_ASSIGNMENT);
+        System.out.println("Consumed = operator");
 
         // Parse the right-hand side expression
-        System.out.println("Parsing right-hand side expression...");
         parseExpression();
     }
-
 
 
     private void variableDeclaration() throws ParseException {

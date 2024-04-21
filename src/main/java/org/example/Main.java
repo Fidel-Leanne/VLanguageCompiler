@@ -5,7 +5,9 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         // Input code to test the parser
-        String inputCode = "START  WRITE M STOP";
+        String inputCode = "START\n" +
+                "INTEGER M, N, K, P, R, H, i, g, k, m\n" +
+                "READ M, N, K ASSIGN N = M - K \n";
 
         try {
             // Tokenize the input code
