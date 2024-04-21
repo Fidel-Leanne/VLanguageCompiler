@@ -7,7 +7,9 @@ public class Main {
         // Input code to test the parser
         String inputCode = "START\n" +
                 "INTEGER M, N, K, P, R, H, i, g, k, m\n" +
-                "READ M, N, K ASSIGN N = M - K \n";
+                "READ M, N, K ASSIGN N = M - K \n " +
+                "WRITE W\n" +
+                "STOP";;
 
         try {
             // Tokenize the input code

@@ -29,25 +29,34 @@ public class Parser {
         } else {
             throw new ParseException("Syntax error: No statements found after START keyword");
         }
+    }
 
+    private void parseStop() throws ParseException {
         match(TokenType.KEYWORD_STOP);
         System.out.println("Program parsed successfully.");
     }
 
 
 
+
     private void statement() throws ParseException {
+
+
+        if (currentTokenIndex >= tokens.size()) {
+            return; // No more tokens to parse
+        }
+
         System.out.println("Identifying statement type...");
         TokenType currentTokenType = tokens.get(currentTokenIndex).getType();
-
+        System.out.println(currentTokenType);
         switch (currentTokenType) {
             case KEYWORD_INTEGER:
                 System.out.println("Variable declaration statement found.");
                 variableDeclaration();
                 break;
             case IDENTIFIER:
-                System.out.println("Identifier statement found.");
-                assignment();
+                System.out.println("Assignment statement found.");
+                assignIdentifier();
                 break;
             case KEYWORD_READ:
                 System.out.println("Read statement found.");
@@ -57,13 +66,19 @@ public class Parser {
                 System.out.println("Write statement found.");
                 writeStatement();
                 break;
+            case KEYWORD_STOP:
+                System.out.println("Stop keyword found.");
+                parseStop();
+                break;
             case KEYWORD_ASSIGN:
-                System.out.println("Assignment statement found");
+                System.out.println("Keyword Assign found");
                 assignment();
+                break;
             default:
                 throw new ParseException("Syntax error: Invalid statement at token " + currentTokenIndex);
         }
     }
+
 
     private void writeStatement() throws ParseException {
         System.out.println("Parsing write statement...");
@@ -76,6 +91,8 @@ public class Parser {
         // Parse the expression to be written
 
         parseIdentifierList();
+
+      statement();
 
     }
 
@@ -216,6 +233,8 @@ public class Parser {
             // If it's not READ, it's a syntax error
             throw new ParseException("Expected READ keyword");
         }
+
+
     }
 
 
@@ -235,32 +254,7 @@ public class Parser {
 
         System.out.println("Identifier list parsed successfully.");
 
-        // Check for keywords like ASSIGN, READ, WRITE, INTEGER
-        TokenType nextTokenType = getCurrentToken().getType();
-        switch (nextTokenType) {
-            case KEYWORD_ASSIGN:
-                System.out.println("Found ASSIGN keyword.");
-                assignment();
-                break;
-            case KEYWORD_READ:
-                System.out.println("Found READ keyword.");
-                readStatement();
-                break;
-            case KEYWORD_WRITE:
-                System.out.println("Found WRITE keyword.");
-                writeStatement();
-                break;
-            case KEYWORD_INTEGER:
-                System.out.println("Found INTEGER keyword.");
-                variableDeclaration();
-                break;
-            case KEYWORD_STOP:
-                System.out.println("found stop Keyword");
-                program();
-            default:
-                // If the next token is not one of the expected keywords, it's a syntax error
-                throw new ParseException("Syntax error: Expected ASSIGN, READ, WRITE, or INTEGER keyword");
-        }
+        statement();
     }
 
 
@@ -287,6 +281,17 @@ public class Parser {
     }
 
 
+    private void assignIdentifier()throws ParseException{
+
+        consume(TokenType.IDENTIFIER);
+
+        consume(TokenType.SYMBOL_ASSIGNMENT);
+
+        parseExpression();
+
+        statement();
+
+    }
 
 
 
@@ -297,7 +302,6 @@ public class Parser {
         // Parse the left-hand side identifier
         consume(TokenType.KEYWORD_ASSIGN);
         parseIdentifier();
-        System.out.println();
 
         // Consume the assignment symbol
         consume(TokenType.SYMBOL_ASSIGNMENT);
@@ -305,6 +309,8 @@ public class Parser {
 
         // Parse the right-hand side expression
         parseExpression();
+
+       statement();
     }
 
 
@@ -317,6 +323,8 @@ public class Parser {
 
         // Parse the list of identifiers
         parseIdentifierList();
+
+        statement();
     }
 
 

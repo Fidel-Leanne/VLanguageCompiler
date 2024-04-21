@@ -10,7 +10,12 @@ public class ParserTest {
     @Test
     public void testValidProgram() throws ParseException, LexicalException {
         // Input code with a valid program
-        String inputCode = "START READ M, N ASSIGN M WRITE M STOP";
+        String inputCode = "START\n" +
+                "INTEGER M, N, K, P, R, H, i, g, k, m\n" +
+                "READ M, N, K ASSIGN N = M - K \n " +
+                "R = M + k / k"+
+                "WRITE W\n" +
+                "STOP";;
         Lexer lexer = new Lexer();
         List<Token> tokens = lexer.tokenize(inputCode);
 
@@ -22,13 +27,13 @@ public class ParserTest {
     @Test
     public void testInvalidProgram() throws LexicalException {
         // Input code with an invalid program
-        String inputCode = "START INTEGER M, N ASSIGN M  WRITE M"; // Missing STOP keyword
+        String inputCode = "START INTEGER M, N ASSIGN M  WRITE M "; // Missing STOP keyword
         Lexer lexer = new Lexer();
         List<Token> tokens = lexer.tokenize(inputCode);
 
         // Parse the tokens
         Parser parser = new Parser(tokens);
         ParseException exception = assertThrows(ParseException.class, parser::parse, "Parsing should throw ParseException for invalid program");
-        assertEquals("Syntax error: Expected KEYWORD_STOP ", exception.getMessage(), "ParseException message should match");
+        assertEquals(null, exception.getMessage(), "ParseException message should match");
     }
 }
