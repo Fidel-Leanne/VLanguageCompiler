@@ -36,4 +36,33 @@ public class ParserTest {
         ParseException exception = assertThrows(ParseException.class, parser::parse, "Parsing should throw ParseException for invalid program");
         assertEquals(null, exception.getMessage(), "ParseException message should match");
     }
+
+
+
+    @Test
+    public void testMissingStartKeyword() {
+        String inputCode = "INTEGER N STOP";
+        assertThrows(ParseException.class, () -> {
+            Lexer lexer = new Lexer();
+            List<Token> tokens = lexer.tokenize(inputCode);
+            Parser parser = new Parser(tokens);
+            parser.parse();
+        });
+    }
+
+    @Test
+    public void testInvalidAssignmentSyntax() {
+        String inputCode = "START ASSIGN N = STOP";
+        assertThrows(ParseException.class, () -> {
+            Lexer lexer = new Lexer();
+            List<Token> tokens = lexer.tokenize(inputCode);
+            Parser parser = new Parser(tokens);
+            parser.parse();
+        });
+    }
+
+
+
+
+
 }
