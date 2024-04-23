@@ -11,6 +11,8 @@ public class Parser {
         this.currentTokenIndex = 0;
     }
 
+
+
     public void parse() throws ParseException {
         System.out.println("Starting parsing...");
         program();
@@ -31,7 +33,7 @@ public class Parser {
         }
     }
 
-    private void parseStop() throws ParseException {
+    private void stop() throws ParseException {
         match(TokenType.KEYWORD_STOP);
         System.out.println("Program parsed successfully.");
     }
@@ -66,7 +68,7 @@ public class Parser {
                 break;
             case KEYWORD_STOP:
                 System.out.println("Stop keyword found.");
-                parseStop();
+                stop();
                 break;
             case KEYWORD_ASSIGN:
                 System.out.println("Keyword Assign found");
@@ -88,7 +90,7 @@ public class Parser {
 
         // Parse the expression to be written
 
-        parseIdentifierList();
+        identifierList();
 
       statement();
 
@@ -222,7 +224,7 @@ public class Parser {
 
             // Parse the list of identifiers
             System.out.println("Parsing list of identifiers...");
-            parseIdentifierList();
+            identifierList();
 
             System.out.println("List of identifiers parsed successfully.");
 
@@ -237,7 +239,7 @@ public class Parser {
 
 
 
-    private void parseIdentifierList() throws ParseException {
+    private void identifierList() throws ParseException {
         System.out.println("Parsing identifier list...");
 
         // Parse the first identifier
@@ -320,7 +322,7 @@ public class Parser {
         System.out.println("Consumed 'INTEGER' keyword...");
 
         // Parse the list of identifiers
-        parseIdentifierList();
+        identifierList();
 
         statement();
     }

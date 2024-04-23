@@ -1,42 +1,68 @@
 package org.example;
+
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        // Input code to test the parser
         String inputCode = "START\n" +
                 "INTEGER M, N, K, P, R, H, i, g, k, m\n" +
-                "READ M, N, K ASSIGN N = M - K \n " +
+                "READ M, N, K \n" +
+                "ASSIGN n = m * k - p / l\n " +
                 "WRITE W\n" +
                 "STOP";
 
+
+        String input = "n = m * k - p / l";
+
         try {
-            // Tokenize the input code
             Lexer lexer = new Lexer();
             List<Token> tokens = lexer.tokenize(inputCode);
 
-            // Parse the tokens
             Parser parser = new Parser(tokens);
             parser.parse();
 
-            // If parsing completes without throwing an exception, the input code is valid
             System.out.println("Parsing successful. Input code is valid.");
-
-            System.out.println();
 
             // Stage 3 of compiler
             System.out.println("\n" + "======STAGE3: COMPILER TECHNIQUES--> SEMANTIC ANALYSIS");
             System.out.println(
-                    "CONCLUSION-->This expression:  is Syntactically and Semantically correct" + "\n");
+                    "CONCLUSION-->This expression: " + inputCode + " is Syntactically and Semantically correct" + "\n");
             // END of stage3
 
-            // Generate ICR
-            ICRGenerator.generateICR(inputCode);
+            // Stage 4 of compiler
+            System.out.println("======STAGE4: COMPILER TECHNIQUES--> INTERMEDIATE CODE REPRESENTATION (ICR)");
+            System.out.println("THE STRING ENTERED IS : " + input);
+            System.out.println("The ICR is as follows: ");
+
+            IntermediateCodeGenerator generator = new IntermediateCodeGenerator();
+            List<String> intermediateCode = generator.generateIntermediateCode(input);
+            System.out.println("Intermediate Code:");
+            for (String code : intermediateCode) {
+                System.out.println(code);
+            }
+
+            // Stage 5 of compiler
+            System.out.println("\n" + "======STAGE5: COMPILER TECHNIQUES--> CODE GENERATION");
+            System.out.println("The generated assembly code is as follows:");
+
+            CodeGenerator codeGenerator = new CodeGenerator();
+            List<String> assemblyCode = codeGenerator.generateCode(intermediateCode);
+            for (String assemblyInstruction : assemblyCode) {
+                System.out.println(assemblyInstruction);
+            }
+
+            // Stage 6: Code Optimization
+            System.out.println("\n" + "======STAGE6: COMPILER TECHNIQUES--> CODE OPTIMIZATION");
+            System.out.println("The optimized assembly code is as follows:");
+
+            CodeOptimizer codeOptimizer = new CodeOptimizer();
+            List<String> optimizedCode = codeOptimizer.optimizeCode(assemblyCode);
+            for (String optimizedInstruction : optimizedCode) {
+                System.out.println(optimizedInstruction);
+            }
+
         } catch (LexicalException | ParseException e) {
-            // If an exception is thrown during lexing or parsing, print the error message
             System.err.println("Error: " + e.getMessage());
         }
-
-
     }
 }
