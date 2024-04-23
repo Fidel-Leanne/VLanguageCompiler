@@ -61,6 +61,15 @@ public class Main {
                 System.out.println(optimizedInstruction);
             }
 
+            // Stage 7: Target Machine Code Generation
+            System.out.println("\n" + "======STAGE7: COMPILER TECHNIQUES--> TARGET MACHINE CODE");
+            System.out.println("The target machine code is as follows:");
+
+            TargetMachineCodeGenerator machineCodeGenerator = new TargetMachineCodeGenerator();
+            for (String assemblyInstruction : assemblyCode) {
+                machineCodeGenerator.generateMachineCode(assemblyInstruction);
+            }
+
         } catch (LexicalException | ParseException e) {
             System.err.println("Error: " + e.getMessage());
         }
