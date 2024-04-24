@@ -7,16 +7,24 @@ public class Main {
         String inputCode = "START\n" +
                 "INTEGER M, N, K, P, R, H, i, g, k, m\n" +
                 "READ M, N, K \n" +
-                "ASSIGN n = m * k - p / l\n " +
+                "ASSIGN n = m * k + p / l\n " +
                 "WRITE W\n" +
                 "STOP";
 
 
-        String input = "n = m * k - p / l";
+        String input = "m * k + p / l";
 
         try {
+
+            System.out.println("======STAGE1: COMPILER TECHNIQUES--> LEXICAL ANALYSER\n");
+
             Lexer lexer = new Lexer();
             List<Token> tokens = lexer.tokenize(inputCode);
+
+            System.out.println("======STAGE1: SUCCESSFUL");
+            System.out.println();
+
+            System.out.println("======STAGE2: COMPILER TECHNIQUES--> PARSER\n");
 
             Parser parser = new Parser(tokens);
             parser.parse();
