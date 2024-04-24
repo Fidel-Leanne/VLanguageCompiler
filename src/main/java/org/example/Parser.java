@@ -11,6 +11,7 @@ public class Parser {
         this.currentTokenIndex = 0;
     }
 
+
     public void parse() throws ParseException {
         System.out.println("Starting parsing...");
         program();
