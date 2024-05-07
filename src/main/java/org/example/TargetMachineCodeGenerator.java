@@ -9,19 +9,22 @@ public class TargetMachineCodeGenerator {
                 // Convert letter to ASCII value and then to binary
                 int asciiValue = (int) c;
                 String binary = Integer.toBinaryString(asciiValue);
-                System.out.println("Binary representation of '" + c + "': " + binary);
+                System.out.print( binary);
 
                 // Print machine code based on the instruction type
                 if (instruction.contains("DIV")) {
-                    System.out.println("01000100");
+                    System.out.print("01000100");
                 } else if (instruction.contains("MUL")) {
-                    System.out.println("01001101");
+                    System.out.print("01001101");
                 } else if (instruction.contains("ADD")) {
-                    System.out.println("01000001");
+                    System.out.print("01000001");
                 } else if (instruction.contains("SUB")) {
-                    System.out.println("01010011");
+                    System.out.print("01010011");
                 }
             }
+
         }
+
+        System.out.println();
     }
 }
